@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Notes App</title>
+    <style>
+        /* CSS styles for the app */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            background-color: #f2f2f2;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .note-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .note {
+            width: calc(20% - 20px);
+            height: 200px;
+            border: 1px solid #ccc;
+            margin: 0 10px 30px 10px;
+            padding: 10px;
+            overflow: auto;
+            box-sizing: border-box;
+        }
+
+        .yellow {
+            background-color: #feff9c;
+        }
+
+        .lightblue {
+            background-color: lightblue;
+        }
+
+        .pink {
+            background-color: pink;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Sticky Notes App</h1>
+        <h3>Create a new note:</h3>
+        <form id="noteForm">
+            <!-- Input fields for adding a new note -->
+            <input type="text" id="note_text" placeholder="Take a note..." style="color: grey; width: 400px">
+            <select id="note_color">
+                <!-- Options for note color selection -->
+                <option value="yellow">Yellow</option>
+                <option value="lightblue">Blue</option>
+                <option value="pink">Pink</option>
+            </select>
+            <button type="button" id="addNoteButton">Add</button> <!-- Change type to button -->
+        </form>
+    </div>
+
+    <div class="note-container">
+        <!-- Display existing notes -->
+        {% for note in notes %}
+        <div class="note {{ note.color }}">
+            <p>{{ note.text }}</p>
+        </div>
+        {% endfor %}
+    </div>
+ 
+    <script>
+        console.log("Script loaded successfully");
+    
+        document.getElementById('addNoteButton').addEventListener('click', function(event) {
+            event.preventDefault();
+            console.log("Button clicked");
+            
+            // Get form values
+            var note_text = document.getElementById('note_text').value;
+            var note_color = document.getElementById('note_color').value;
+            console.log("Note text:", note_text);
+            console.log("Note color:", note_color);
+            
+            // Check if title and content are empty
+            if (!note_text.trim() || !note_color.trim()) {
+                console.log("Title and content are required");
+                return;
+            }
+            
+            // Create JSON object
+            var data = {
+                "note_text": note_text,
+                "note_color": note_color
+            };
+            console.log("Data:", data);
+            
+            // Send POST request to Flask backend
+            fetch('/add_note', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response:", data);
+                // Handle response from backend
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle error
+            });
+        });
+    </script>
+    
+    
+</body>
+</html>
