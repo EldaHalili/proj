@@ -38,20 +38,13 @@ def create_note():
     cur.close()
     return jsonify({"message": "Note created successfully"})
 
-    data = request.json
-    if not data:
-        return jsonify({"error": "No JSON data received"}), 400
-
-    title = data.get('note_text')
-    content = data.get('note_color')
-    if not title or not content:
-        return jsonify({"error": "Title and content are required"}), 400
-
+@app.route('/delete_note/<int:note_id>', methods=['POST'])
+def delete_note(note_id):
     cur = mysql.connection.cursor()
-    cur.execute("INSERT INTO notes (title, content) VALUES (%s, %s)", (title, content))
+    cur.execute("DELETE FROM notes WHERE id = %s", (note_id,))
     mysql.connection.commit()
     cur.close()
-    return jsonify({"message": "Note created successfully"})
+    return jsonify({"message": "Note deleted successfully"})
 
 if __name__ == '__main__':
     app.run(debug=True)

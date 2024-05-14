@@ -56,7 +56,8 @@
     <div class="header">
         <h1>Sticky Notes App</h1>
         <h3>Create a new note:</h3>
-        <form id="noteForm">
+        <form id="noteForm" action="/add_note" method="post">
+
             <!-- Input fields for adding a new note -->
             <input type="text" id="note_text" placeholder="Take a note..." style="color: grey; width: 400px">
             <select id="note_color">
@@ -66,45 +67,42 @@
                 <option value="pink">Pink</option>
             </select>
             <button type="button" id="addNoteButton">Add</button> <!-- Change type to button -->
+            
         </form>
     </div>
+   
 
-    <div class="note-container">
-        <!-- Display existing notes -->
-        {% for note in notes %}
-        <div class="note {{ note.color }}">
-            <p>{{ note.text }}</p>
-        </div>
-        {% endfor %}
+    <div class="note-container" id="noteContainer">
+        <!-- Existing notes will be dynamically added here -->
     </div>
- 
+    
     <script>
         console.log("Script loaded successfully");
     
         document.getElementById('addNoteButton').addEventListener('click', function(event) {
             event.preventDefault();
             console.log("Button clicked");
-            
+    
             // Get form values
             var note_text = document.getElementById('note_text').value;
             var note_color = document.getElementById('note_color').value;
             console.log("Note text:", note_text);
             console.log("Note color:", note_color);
-            
+    
             // Check if title and content are empty
             if (!note_text.trim() || !note_color.trim()) {
                 console.log("Title and content are required");
                 return;
             }
-            
+    
             // Create JSON object
             var data = {
                 "note_text": note_text,
                 "note_color": note_color
             };
             console.log("Data:", data);
-            
-            // Send POST request to Flask backend
+    
+            // Send POST request to Flask backend to add the note
             fetch('/add_note', {
                 method: 'POST',
                 headers: {
@@ -116,14 +114,64 @@
             .then(data => {
                 console.log("Response:", data);
                 // Handle response from backend
+                if (data.message) {
+                    // If note added successfully, create and append a new note
+                    var noteContainer = document.getElementById('noteContainer');
+                    var noteDiv = document.createElement('div');
+                    noteDiv.classList.add('note', note_color); // Use the color from the form
+                    var p = document.createElement('p');
+                    p.textContent = note_text;
+                    noteDiv.appendChild(p);
+                    
+                    // Create delete button with note_id in dataset
+                    var deleteButton = document.createElement('button');
+                    deleteButton.textContent = "Delete";
+                    deleteButton.dataset.noteId = data.note_id; // Set dataset for note id
+                    deleteButton.classList.add('deleteNoteButton');
+                    noteDiv.appendChild(deleteButton);
+                    
+                    noteContainer.appendChild(noteDiv);
+                } else {
+                    console.error('Error:', data.error);
+                    // Handle error
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
                 // Handle error
             });
         });
-    </script>
     
+        document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('deleteNoteButton')) {
+        var noteId = event.target.dataset.noteId;
+        if (!noteId) return;
+
+        // Send POST request to Flask backend to delete the note
+        fetch('/delete_note/' + noteId, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Delete Response:", data);
+            // Handle delete response
+            if (data.message) {
+                // Remove the deleted note from the UI
+                event.target.parentElement.remove();
+            } else {
+                console.error('Delete Error:', data.error);
+                // Handle delete error
+            }
+        })
+        .catch(error => {
+            console.error('Delete Error:', error);
+            // Handle delete error
+        });
+    }
+});
+
+    </script>
     
 </body>
 </html>
+
