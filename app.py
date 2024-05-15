@@ -13,7 +13,7 @@ mysql = MySQL(app)
 def index():
     return render_template('index.html')
 
-@app.route('/', methods=['GET'])
+@app.route('/notes', methods=['GET'])
 def get_notes():
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM notes")
@@ -35,15 +35,30 @@ def create_note():
     cur = mysql.connection.cursor()
     cur.execute("INSERT INTO notes (title, content) VALUES (%s, %s)", (title, content))
     mysql.connection.commit()
+    cur.execute("SELECT LAST_INSERT_ID()")
+    note_id = cur.fetchone()[0]
     cur.close()
-    return jsonify({"message": "Note created successfully"})
+    return jsonify({"message": "Note created successfully", "note_id": note_id})
 
-@app.route('/delete_note/<int:note_id>', methods=['POST'])
+
+@app.route('/delete_note/<int:note_id>', methods=['DELETE'])
 def delete_note(note_id):
+    # Check if the note with the given note_id exists
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM notes WHERE id = %s", (note_id,))
+    note = cur.fetchone()
+    cur.close()
+
+    if not note:
+        # If the note doesn't exist, return an error response
+        return jsonify({"error": "Note not found"}), 404
+
+    # If the note exists, proceed with the delete operation
     cur = mysql.connection.cursor()
     cur.execute("DELETE FROM notes WHERE id = %s", (note_id,))
     mysql.connection.commit()
     cur.close()
+
     return jsonify({"message": "Note deleted successfully"})
 
 if __name__ == '__main__':
