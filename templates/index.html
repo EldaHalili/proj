@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sticky Notes App</title>
+    <title>Simple Note Taking Application</title>
     <style>
-        /* CSS styles for the app */
+        /* CSS styles for the application */
         body {
             margin: 0;
             padding: 0;
@@ -54,14 +54,14 @@
 </head>
 <body>
     <div class="header">
-        <h1>Sticky Notes App</h1>
+        <h1>Simple Note Taking Application</h1>
         <h3>Create a new note:</h3>
         <form id="noteForm" action="/add_note" method="post">
 
             <!-- Input fields for adding a new note -->
             <input type="text" id="note_text" placeholder="Take a note..." style="color: grey; width: 400px">
             <select id="note_color">
-                <!-- Options for note color selection -->
+                <!-- Options for note color selction -->
                 <option value="yellow">Yellow</option>
                 <option value="lightblue">Blue</option>
                 <option value="pink">Pink</option>
@@ -73,7 +73,7 @@
    
 
     <div class="note-container" id="noteContainer">
-        <!-- Existing notes will be dynamically added here -->
+        <!-- notes that exist will be dynamically added here -->
     </div>
     
     <script>
@@ -113,12 +113,12 @@
     .then(response => response.json())
     .then(data => {
         console.log("Response:", data);
-        // Handle response from backend
+        // here it handles response from backend
         if (data.message) {
-            // If note added successfully, create and append a new note
+            // If note is added successfully, create and append a new note
             var noteContainer = document.getElementById('noteContainer');
             var noteDiv = document.createElement('div');
-            noteDiv.classList.add('note', note_color); // Use the color from the form
+            noteDiv.classList.add('note', note_color); // Use the color from the form note color
             var p = document.createElement('p');
             p.textContent = note_text;
             noteDiv.appendChild(p);
@@ -159,13 +159,13 @@ document.addEventListener('click', function(event) {
                 .then(response => response.json())
         .then(data => {
             console.log("Delete Response:", data);
-            // Handle delete response
+            // Handle delete responsess
             if (data.message) {
                 // Remove the deleted note from the UI
                 event.target.parentElement.remove();
             } else {
                 console.error('DELETE Error:', data.error);
-                // Handle delete error
+                //  delete error.. 
             }
         })
         .catch(error => {
