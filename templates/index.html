@@ -122,7 +122,6 @@
             var p = document.createElement('p');
             p.textContent = note_text;
             noteDiv.appendChild(p);
-
             
             // Create delete button with note_id in dataset
             var deleteButton = document.createElement('button');
@@ -136,8 +135,6 @@
             console.error('Error:', data.error);
             // Handle error
         }
-
-
     })
     .catch(error => {
         console.error('Error:', error);
@@ -155,7 +152,7 @@ document.addEventListener('click', function(event) {
             method: 'DELETE',
             
         })
-        
+
                 .then(response => response.json())
         .then(data => {
             console.log("Delete Response:", data);
@@ -174,11 +171,6 @@ document.addEventListener('click', function(event) {
         });
     }
 });
-
-
-</script>
-    
-    
+</script> 
 </body>
 </html>
-`
